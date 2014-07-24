@@ -18,7 +18,7 @@ using System.Globalization;
 
 namespace Microsoft.WindowsAzure
 {
-    /// <summary>
+     /// <summary>
     /// Configuration manager for accessing Microsoft Azure settings.
     /// </summary>
     public static class CloudConfigurationManager
@@ -26,12 +26,16 @@ namespace Microsoft.WindowsAzure
         private static object _lock = new object();
         private static AzureApplicationSettings _appSettings;
 
+       
+   
+
         /// <summary>
-        /// Gets a setting with the given name.
+        /// Gets a setting with the given name using the provided <see cref="CloudConfigurationManagerSettingProviders"/> SettingProviders
         /// </summary>
         /// <param name="name">Setting name.</param>
+        /// <param name="providers">Providers for where to look for settings</param>
         /// <returns>Setting value or null if not found.</returns>
-        public static string GetSetting(string name)
+        public static string GetSetting(string name, params string[] providers)
         {
             if (name == null)
             {
@@ -43,7 +47,27 @@ namespace Microsoft.WindowsAzure
                 throw new ArgumentException(message);
             }
 
-            return AppSettings.GetSetting(name);
+            if (providers == null)
+            {
+                throw new ArgumentNullException("providers");
+            }
+            else if(providers.Length == 0)
+            {
+                return null;
+            }
+
+
+            return AppSettings.GetSetting(name, providers);
+        }
+
+        /// <summary>
+        /// Gets a setting with the given name.
+        /// </summary>
+        /// <param name="name">Setting name.</param>
+        /// <returns>Setting value or null if not found.</returns>
+        public static string GetSetting(string name)
+        {
+            return GetSetting(name, new string[]{ CloudConfigurationManagerSettingProviders.ServiceRuntime , CloudConfigurationManagerSettingProviders.ConfigurationManager});
         }
 
         /// <summary>

@@ -113,19 +113,24 @@ namespace Microsoft.WindowsAzure
         /// Gets a setting with the given name.
         /// </summary>
         /// <param name="name">Setting name.</param>
+        /// <param name="providers">Providers for where to look for settings</param>
         /// <returns>Setting value or null if such setting does not exist.</returns>
-        internal string GetSetting(string name)
+        internal string GetSetting(string name, params string[] providers)
         {
             Debug.Assert(!string.IsNullOrEmpty(name));
 
             string value = null;
+            int counter = 0;
 
-            value = GetValue("ServiceRuntime", name, GetServiceRuntimeSetting);
-            if (value == null)
+
+            while(counter < providers.Length && value == null)
             {
-                value = GetValue("ConfigurationManager", name, n => ConfigurationManager.AppSettings[n]);
+                if(providers[counter].Equals(CloudConfigurationManagerSettingProviders.ServiceRuntime))
+                    value = GetValue(CloudConfigurationManagerSettingProviders.ServiceRuntime, name, GetServiceRuntimeSetting);
+                else  if(providers[counter].Equals(CloudConfigurationManagerSettingProviders.ConfigurationManager))
+                    value = GetValue("ConfigurationManager", name, n => ConfigurationManager.AppSettings[n]);
             }
-
+            
             return value;
         }
 
