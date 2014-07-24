@@ -120,10 +120,9 @@ namespace Microsoft.WindowsAzure
             Debug.Assert(!string.IsNullOrEmpty(name));
 
             string value = null;
-            int counter = 0;
+            int counter = -1;
 
-
-            while(counter < providers.Length && value == null)
+            while(++counter < providers.Length && value == null)
             {
                 if(providers[counter].Equals(CloudConfigurationManagerSettingProviders.ServiceRuntime))
                     value = GetValue(CloudConfigurationManagerSettingProviders.ServiceRuntime, name, GetServiceRuntimeSetting);
